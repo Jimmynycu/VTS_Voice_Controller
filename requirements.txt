@@ -1,0 +1,8 @@
+pyvts
+sherpa-onnx
+sounddevice
+pyyaml
+loguru
+requests
+tqdm
+onnxruntime

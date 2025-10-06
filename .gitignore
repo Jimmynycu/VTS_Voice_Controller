@@ -1,0 +1,14 @@
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+
+# VTube Studio authentication token
+vts_token.txt
+
+# Downloaded ASR models
+models/
+
+# Gemini CLI files
+.gemini/

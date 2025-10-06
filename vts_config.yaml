@@ -1,0 +1,9 @@
+vts_settings:
+  host: 127.0.0.1
+  port: 8001
+  token_file: vts_token.txt
+expressions:
+  Heart Eyes: 934b791e1f9d4284b54988211e380d89
+  Eyes Cry: 0b01a1f89bca4dfcaedc4f892a7d5dce
+  Angry Sign: 937bc0c1af794cdca15ded0c34981894
+  Shock Sign: 40209f606adc4ca4a6e7df620f735bf7
