@@ -83,8 +83,6 @@ class VoiceRecognition(ASRInterface):
         print("DEBUG: Initializing recognizer...")
         self.recognizer = self._create_recognizer()
         print(f"DEBUG: Recognizer initialized: {self.recognizer}")
-        self.stream = self.recognizer.create_stream() # Create a single stream for continuous processing
-        print(f"DEBUG: Stream created: {self.stream}")
 
     def _create_recognizer(self):
         print("DEBUG: Entering _create_recognizer...")
@@ -204,11 +202,14 @@ class VoiceRecognition(ASRInterface):
 
         return recognizer
 
-        self.recognizer = self._create_recognizer()
-        self.stream = self.recognizer.create_stream() # Create a single stream for continuous processing
-
     def transcribe_np(self, audio: np.ndarray) -> str:
-        self.stream.accept_waveform(self.SAMPLE_RATE, audio)
-        self.recognizer.decode_streams([self.stream])
-        text = self.stream.result.text
+        stream = self.recognizer.create_stream()
+        stream.accept_waveform(self.SAMPLE_RATE, audio)
+        self.recognizer.decode_streams([stream])
+        text = stream.result.text
         return text
+
+    async def async_transcribe_np(self, audio: np.ndarray) -> str:
+        import asyncio
+        loop = asyncio.get_running_loop()
+        return await loop.run_in_executor(None, self.transcribe_np, audio)

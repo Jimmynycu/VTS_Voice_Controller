@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-This project is a Python application that controls a VTube Studio model using voice commands. It listens to the user's microphone, transcribes their speech in real-time, and triggers facial expressions in VTube Studio when specific keywords are detected.
+This project is a Python application that controls a VTube Studio model using voice commands. It listens to the user's microphone, transcribes their speech in real-time, and triggers facial expressions in VTube Studio when specific keywords are detected. The focus is on low-latency, real-time reactions.
 
 The core technologies used are:
 - **VTube Studio Integration:** `pyvts` library is used to communicate with the VTube Studio API.
-- **Voice Recognition:** `sherpa-onnx` is used for speech-to-text transcription.
-- **Audio Input:** `sounddevice` is used to capture audio from the microphone.
+- **Voice Recognition:** `sherpa-onnx` (specifically `OnlineRecognizer`) is used for real-time speech-to-text transcription.
+- **Audio Input:** `sounddevice` is used to capture audio from the microphone with optimized buffering for real-time performance.
 - **Configuration:** `pyyaml` is used to manage application settings.
 
 The application is structured as follows:
@@ -49,4 +49,4 @@ To run this project, follow these steps:
 - Unit tests are written using `pytest` and `unittest.mock`.
 - Configuration is managed through a `vts_config.yaml` file.
 - The `VTSClient` class in `vts_client.py` encapsulates all interactions with the VTube Studio API.
-- The main application logic in `vts_main.py` is responsible for orchestrating the audio input, voice recognition, and VTS expression triggering.
+- The main application logic in `vts_main.py` is responsible for orchestrating the audio input, real-time voice recognition using `sherpa-onnx.OnlineRecognizer`, and VTS expression triggering.
