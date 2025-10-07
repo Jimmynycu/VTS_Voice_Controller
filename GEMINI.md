@@ -2,51 +2,61 @@
 
 ## Project Overview
 
-This project is a Python application that controls a VTube Studio model using voice commands. It listens to the user's microphone, transcribes their speech in real-time, and triggers facial expressions in VTube Studio when specific keywords are detected. The focus is on low-latency, real-time reactions.
+This project is a Python application that controls a VTube Studio model using voice commands. It periodically listens to the user's microphone, transcribes their speech, and triggers facial expressions in VTube Studio when specific keywords are detected.
 
-The core technologies used are:
-- **VTube Studio Integration:** `pyvts` library is used to communicate with the VTube Studio API.
-- **Voice Recognition:** `sherpa-onnx` (specifically `OnlineRecognizer`) is used for real-time speech-to-text transcription.
-- **Audio Input:** `sounddevice` is used to capture audio from the microphone with optimized buffering for real-time performance.
-- **Configuration:** `pyyaml` is used to manage application settings.
+The application features an automatic synchronization system that fetches available expressions from VTube Studio and updates the local configuration file, making it easy to add new keywords. It also includes a spam prevention mechanism to avoid repeatedly triggering the same expression.
 
-The application is structured as follows:
-- `vts_main.py`: The main entry point of the application. It handles loading the configuration, initializing the VTS client, and managing the audio stream.
-- `vts_client.py`: A client class to interact with the VTube Studio API, including connecting, authenticating, and triggering expressions.
-- `vts_config.yaml`: The configuration file for VTS settings (host, port, token file) and the keyword-to-expression mappings.
-- `test_vts_main.py`: Contains unit tests for the main application logic.
+## Core Technologies
+
+- **VTube Studio Integration:** `pyvts` library for VTS API communication.
+- **Voice Recognition:** `sherpa-onnx` for speech-to-text transcription.
+- **Audio Input:** `sounddevice` for microphone audio capture.
+- **Configuration:** `pyyaml` for managing application settings.
+- **Logging:** `loguru` for application logging.
+- **Async Operations:** `asyncio` for managing concurrent tasks.
+
+## Application Structure
+
+- **`vts_main.py`**: The main application entry point. It manages configuration, VTS connection, audio buffering, periodic transcription, and expression triggering.
+- **`vts_client.py`**: A client class that encapsulates all interactions with the VTube Studio API, including connecting, authenticating, fetching hotkeys, and triggering expressions. It now includes a request lock to prevent API request race conditions.
+- **`src/open_llm_vtuber/asr/sherpa_onnx_asr.py`**: A wrapper for the `sherpa-onnx` ASR engine, configured to use an offline model for transcription.
+- **`vts_config.yaml`**: The configuration file for VTS settings and keyword-to-expression mappings. This file is now automatically updated on startup.
+- **`requirements.txt`**: A list of all Python dependencies.
+
+## Key Features
+
+- **Automatic Expression Sync:** On startup, the application connects to VTube Studio, fetches the list of available expressions for the current model, and updates `vts_config.yaml`. New expressions are added with a placeholder keyword (e.g., `NEW_KEYWORD_ExpressionName`).
+- **Flexible Keyword Detection:** Triggers expressions based on keywords defined in the YAML file. It also automatically uses the expression's name in VTube Studio as a keyword.
+- **Batch Audio Processing:** Captures microphone audio into a buffer and processes it in chunks to transcribe speech.
+- **Spam Prevention:** If an expression is triggered twice in a row, it is placed on a 60-second cooldown to prevent spam.
+- **GPU Acceleration:** Can leverage a CUDA-enabled GPU for faster transcription if `onnxruntime-gpu` is installed and the provider is set to `cuda`.
+
+## How It Works
+
+1.  **Initialization:** The application loads settings from `vts_config.yaml`.
+2.  **VTS Connection:** It connects to VTube Studio and authenticates.
+3.  **Expression Sync:** It requests the list of all hotkeys from VTube Studio, filters for expressions, and updates `vts_config.yaml` with any new or changed expressions. It then builds a map of keywords to hotkey IDs for the current session.
+4.  **Audio Streaming:** The application starts listening to the microphone, capturing audio into a buffer.
+5.  **Periodic Transcription:** Every few seconds, the content of the audio buffer is processed. The audio is amplified and sent to the `sherpa-onnx` offline recognizer for transcription.
+6.  **Keyword Matching:** The transcribed text is checked for matches with the keywords from the expression map.
+7.  **Trigger Expression:** If a keyword is found and the expression is not on cooldown, the application sends a request to the VTube Studio API to trigger the corresponding expression hotkey.
 
 ## Building and Running
 
-To run this project, follow these steps:
-
-1. **Install Dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Configure the Application:**
-   - Open the `vts_config.yaml` file.
-   - Under `vts_settings`, ensure the `host` and `port` match your VTube Studio API settings.
-   - The `token_file` will be created automatically on the first run.
-   - Under `expressions`, map the keywords you want to detect to the corresponding VTube Studio expression files (`.exp3.json`).
-
-3. **Run the Application:**
-   ```bash
-   python vts_main.py
-   ```
-   The first time you run the application, you will need to authenticate the plugin in VTube Studio.
-
-4. **Run Tests:**
+1.  **Install Dependencies:**
     ```bash
-    pytest
+    pip install -r requirements.txt
     ```
+    *(Note: For GPU support, you may need to install a specific version of `onnxruntime-gpu`)*
 
-## Development Conventions
+2.  **Run the Application:**
+    ```bash
+    python vts_main.py
+    ```
+3.  **First-Time Setup:**
+    - On the first run, you will need to allow the plugin's authentication request inside VTube Studio.
+    - The application will automatically populate `vts_config.yaml` with expressions from your current VTS model.
 
-- The application uses asynchronous programming with `asyncio`.
-- Logging is handled by the `loguru` library.
-- Unit tests are written using `pytest` and `unittest.mock`.
-- Configuration is managed through a `vts_config.yaml` file.
-- The `VTSClient` class in `vts_client.py` encapsulates all interactions with the VTube Studio API.
-- The main application logic in `vts_main.py` is responsible for orchestrating the audio input, real-time voice recognition using `sherpa-onnx.OnlineRecognizer`, and VTS expression triggering.
+4.  **Configure Keywords:**
+    - Open `vts_config.yaml`.
+    - Change the placeholder keywords (e.g., `NEW_KEYWORD_MyExpression`) to the voice commands you want to use.
