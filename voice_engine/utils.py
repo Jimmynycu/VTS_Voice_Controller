@@ -4,7 +4,7 @@ import tarfile
 from pathlib import Path
 from tqdm import tqdm
 from loguru import logger
-
+import sys # Import sys
 
 def get_github_asset_url(owner, repo, release_tag, filename_without_ext):
     """
@@ -25,7 +25,7 @@ def get_github_asset_url(owner, repo, release_tag, filename_without_ext):
     try:
         # Make a GET request to fetch release data
         response = requests.get(url, headers=headers)
-        response.raise_for_status()
+        response.raise_for_status()  # Raise an error for bad status codes
 
         # Parse the JSON response
         release_data = response.json()
@@ -78,6 +78,9 @@ def download_and_extract(url: str, output_dir: str) -> Path:
         )
         return extracted_dir_path
 
+    # Determine if tqdm should be disabled
+    disable_tqdm = getattr(sys, 'frozen', False) # Disable tqdm if running in a PyInstaller bundle
+
     # Download the file
     logger.info(f"🏃‍♂️Downloading {url} to {file_path}...")
     response = requests.get(url, stream=True)
@@ -93,6 +96,7 @@ def download_and_extract(url: str, output_dir: str) -> Path:
             unit="iB",
             unit_scale=True,
             unit_divisor=1024,
+            disable=disable_tqdm # Apply disable flag here
         ) as pbar,
     ):
         for chunk in response.iter_content(chunk_size=8192):
