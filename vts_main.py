@@ -5,12 +5,19 @@ import yaml
 from loguru import logger
 import os
 import time
+import sys # Import sys for PyInstaller path handling
 
 from voice_engine.recognizer import VoiceRecognition
 from vts_client import VTSClient
 
+# --- Determine Base Path for Resources ---
+if getattr(sys, 'frozen', False): # Check if running in a PyInstaller bundle
+    BASE_PATH = os.path.dirname(sys.executable)
+else:
+    BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+
 # --- Configuration ---
-CONFIG_PATH = "vts_config.yaml"
+CONFIG_PATH = os.path.join(BASE_PATH, "vts_config.yaml")
 
 # --- Global Variables ---
 vts_client = None
@@ -18,6 +25,10 @@ expression_map = {}
 last_triggered_expression = None
 consecutive_trigger_count = 0
 expression_cooldowns = {}
+
+# --- Audio Buffering ---
+audio_buffer = np.array([], dtype=np.float32)
+buffer_lock = asyncio.Lock()
 
 async def asr_callback(transcribed_text: str):
     """Callback function to process transcribed text with spam prevention."""
@@ -58,38 +69,55 @@ async def asr_callback(transcribed_text: str):
 
 async def audio_callback(indata, frames, time, status):
     """This is called (from a separate thread) for each audio block."""
+    global audio_buffer
     if status:
         logger.warning(status)
-    
-    try:
-        # The ASR engine expects a 1D numpy array of float32
-        audio_np = indata.flatten().astype(np.float32)
-        text = await asr_engine.async_transcribe_np(audio_np)
-        if text:
-            await asr_callback(text)
-    except Exception as e:
-        logger.error(f"Error during transcription: {e}")
+    async with buffer_lock:
+        audio_buffer = np.concatenate((audio_buffer, indata.flatten()))
 
 async def main():
-    global vts_client, expression_map, asr_engine
+    # --- Setup Logging ---
+    log_path = os.path.join(BASE_PATH, "vts_controller.log")
+    logger.add(log_path, rotation="10 MB", retention="7 days", level="INFO", backtrace=True, diagnose=True)
+
+    global vts_client, expression_map, asr_engine, audio_buffer, buffer_lock
 
     # 1. Load Configuration
-    try:
-        with open(CONFIG_PATH, 'r') as f:
-            config = yaml.safe_load(f)
-        vts_settings = config['vts_settings']
-        expression_map = config['expressions']
-        logger.info("Configuration loaded.")
-    except FileNotFoundError:
-        logger.error(f"Configuration file not found at {CONFIG_PATH}. Please create it.")
-        return
-    except Exception as e:
-        logger.error(f"Error loading configuration: {e}")
-        return
+    config = {}
+    if not os.path.exists(CONFIG_PATH):
+        logger.warning(f"Configuration file not found at {CONFIG_PATH}. Creating a default one.")
+        default_config = {
+            'vts_settings': {
+                'host': '127.0.0.1',
+                'port': 8001,
+                'token_file': os.path.join(BASE_PATH, 'vts_token.txt') # Use BASE_PATH for token file
+            },
+            'expressions': {
+                'hello': 'DefaultExpression.exp3.json' # Placeholder
+            }
+        }
+        try:
+            with open(CONFIG_PATH, 'w') as f:
+                yaml.safe_dump(default_config, f, default_flow_style=False, allow_unicode=True)
+            config = default_config
+            logger.info("Default configuration created.")
+        except Exception as e:
+            logger.error(f"Error creating default configuration: {e}")
+            return # Cannot proceed without config
+    else:
+        try:
+            with open(CONFIG_PATH, 'r') as f:
+                config = yaml.safe_load(f)
+            logger.info("Configuration loaded.")
+        except Exception as e:
+            logger.error(f"Error loading configuration from {CONFIG_PATH}: {e}")
+            return # Cannot proceed if existing config is invalid
+
+    vts_settings = config['vts_settings']
+    expression_map = config['expressions']
 
     # 2. Initialize ASR Engine
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    absolute_model_dir = os.path.join(script_dir, "models", "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17")
+    absolute_model_dir = os.path.join(BASE_PATH, "models", "sherpa-onnx-sense-voice-zh-en-ja-ko-yue-2024-07-17")
     asr_engine = VoiceRecognition(
         sense_voice_model_dir=absolute_model_dir,
         debug=False,
@@ -169,13 +197,39 @@ async def main():
     loop = asyncio.get_running_loop()
 
     def sync_audio_callback(indata, frames, time, status):
+        """A synchronous callback that schedules the async audio processing on the main event loop."""
         asyncio.run_coroutine_threadsafe(audio_callback(indata, frames, time, status), loop)
 
     try:
-        with sd.InputStream(callback=sync_audio_callback, channels=1, dtype='float32', samplerate=16000):
+        # Set blocksize to a fraction of the sample rate for lower latency
+        blocksize = int(16000 * 0.2) # 200ms chunks
+        with sd.InputStream(callback=sync_audio_callback,
+                             channels=1, dtype='float32', samplerate=16000, blocksize=blocksize):
             logger.info("Microphone stream started. Say something!")
             while True:
-                await asyncio.sleep(1)
+                await asyncio.sleep(2.0) # How often to run transcription
+
+                async with buffer_lock:
+                    if len(audio_buffer) == 0:
+                        continue
+                    
+                    # Make a copy and clear the shared buffer
+                    processing_buffer = audio_buffer.copy()
+                    audio_buffer = np.array([], dtype=np.float32)
+
+                # Amplify the audio signal, but clip it to the valid range [-1, 1]
+                amplified_audio = processing_buffer * 20.0
+                clipped_audio = np.clip(amplified_audio, -1.0, 1.0)
+
+                # The ASR engine expects a 1D numpy array of float32
+                audio_np = clipped_audio.astype(np.float32)
+                try:
+                    text = await asr_engine.async_transcribe_np(audio_np)
+                    if text:
+                        await asr_callback(text)
+                except Exception as e:
+                    logger.error(f"Error during transcription: {e}")
+
     except KeyboardInterrupt:
         logger.info("Stopping...")
     except Exception as e:
