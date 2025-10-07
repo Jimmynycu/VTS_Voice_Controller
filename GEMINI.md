@@ -41,13 +41,37 @@ The application features an automatic synchronization system that fetches availa
 6.  **Keyword Matching:** The transcribed text is checked for matches with the keywords from the expression map.
 7.  **Trigger Expression:** If a keyword is found and the expression is not on cooldown, the application sends a request to the VTube Studio API to trigger the corresponding expression hotkey.
 
-## Building and Running
+## Development Setup
 
-1.  **Install Dependencies:**
+To ensure a clean and isolated environment, it is highly recommended to use a Python virtual environment (`venv`).
+
+1.  **Create a Virtual Environment:**
+    Open your terminal in the project root and run:
+    ```bash
+    python -m venv .venv
+    ```
+
+2.  **Activate the Virtual Environment:**
+    -   **Windows (Command Prompt/PowerShell):**
+        ```cmd
+        .\.venv\Scripts\activate
+        ```
+    -   **macOS/Linux (Bash):**
+        ```sh
+        source .venv/bin/activate
+        ```
+    Your terminal prompt should now indicate that you are in the `.venv` environment.
+
+3.  **Install Dependencies:**
+    With the virtual environment active, install the required packages:
     ```bash
     pip install -r requirements.txt
     ```
     *(Note: For GPU support, you may need to install a specific version of `onnxruntime-gpu`)*
+
+## Building and Running
+
+1.  **Activate Environment:** Ensure your virtual environment is active (see step 2 above).
 
 2.  **Run the Application:**
     ```bash

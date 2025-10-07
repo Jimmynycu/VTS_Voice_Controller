@@ -1,9 +1,11 @@
 @echo off
-ECHO "--- Activating virtual environment ---"
-CALL .\.venv\Scripts\activate.bat
 
-ECHO "--- Starting VTS Voice Controller ---"
+echo "--- Activating virtual environment ---"
+call .\.venv\Scripts\activate.bat
+
+echo "--- Starting VTS Voice Controller ---"
 python vts_main.py
 
-ECHO "--- Program finished. Press any key to exit ---"
+echo.
+echo "--- Program finished. Press any key to exit ---"
 pause
