@@ -2,7 +2,6 @@ import os
 import numpy as np
 import sherpa_onnx
 from loguru import logger
-from .interface import ASRInterface
 from .utils import download_and_extract, check_and_extract_local_file
 import onnxruntime
 
