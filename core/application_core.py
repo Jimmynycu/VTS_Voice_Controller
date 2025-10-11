@@ -1,6 +1,7 @@
 
 import asyncio
 import yaml
+import aiohttp
 from loguru import logger
 import os
 import sys
@@ -12,9 +13,10 @@ from inputs.test_input_processor import TestInputProcessor
 from inputs.asr_processor import ASRProcessor
 from inputs.utils.utils import ensure_model_downloaded_and_extracted
 
+from core.path_config import get_vts_config_path, get_config_path, get_models_dir
+
 class ApplicationCore:
-    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en", provider: str = "cpu"):
-        self.config_path = config_path
+    def __init__(self, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en", provider: str = "cpu"):
         self.test_mode = test_mode
         self.recognition_mode = recognition_mode
         self.language = language
@@ -26,20 +28,14 @@ class ApplicationCore:
         self.input_processor = None
 
     def _load_config(self):
-        if getattr(sys, 'frozen', False):
-            base_path = os.path.dirname(sys.executable)
-        else:
-            base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        config_path = os.path.join(base_path, self.config_path)
-
+        config_path = get_vts_config_path()
         if not os.path.exists(config_path):
             logger.warning(f"Configuration file not found at {config_path}. Creating a default one.")
             default_config = {
                 'vts_settings': {
                     'host': '127.0.0.1',
                     'port': 8001,
-                    'token_file': os.path.join(base_path, 'vts_token.txt')
+                    'token_file': os.path.join(os.path.dirname(config_path), 'vts_token.txt')
                 },
                 'expressions': {
                     'DefaultExpression.exp3.json': {
@@ -70,6 +66,7 @@ class ApplicationCore:
             logger.error("Initialization failed: Configuration is not loaded.")
             return
 
+        await self.event_bus.publish("asr_status_update", "Connecting to VTS...")
         vts_settings = self.config['vts_settings']
         self.vts_agent = VTSWebSocketAgent(
             host=vts_settings['host'],
@@ -79,8 +76,10 @@ class ApplicationCore:
         )
 
         await self.vts_agent.connect()
+        await self.event_bus.publish("asr_status_update", "Authenticating...")
         await self.vts_agent.authenticate()
 
+        await self.event_bus.publish("asr_status_update", "Synchronizing expressions...")
         expression_map = await self._synchronize_expressions()
 
         self.intent_resolver = KeywordIntentResolver(self.event_bus, expression_map)
@@ -91,20 +90,26 @@ class ApplicationCore:
         else:
             logger.info("--- RUNNING IN NORMAL MODE (MICROPHONE INPUT) ---")
             # This is where the real ASRProcessor is initialized
-            with open("config/models.yaml", 'r') as f:
-                model_config = yaml.safe_load(f)
+            try:
+                with open(get_config_path("models.yaml"), 'r') as f:
+                    model_config = yaml.safe_load(f)
+            except FileNotFoundError:
+                logger.error(f"Model configuration file not found at {get_config_path('models.yaml')}")
+                await self.event_bus.publish("asr_status_update", "Error: models.yaml not found")
+                return
+            except Exception as e:
+                logger.error(f"Error loading model configuration: {e}")
+                await self.event_bus.publish("asr_status_update", f"Error: {e}")
+                return
 
             selected_model = model_config.get(self.language.lower())
             if not selected_model:
                 logger.error(f"Language '{self.language}' not supported. Please check the model_config.")
+                await self.event_bus.publish("asr_status_update", f"Error: Language {self.language} not supported")
                 return
 
             model_url = selected_model["url"]
-            if getattr(sys, 'frozen', False):
-                base_path = os.path.dirname(sys.executable)
-            else:
-                base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            model_base_dir = os.path.join(base_path, "models")
+            model_base_dir = get_models_dir()
 
             async def progress_callback(progress):
                 await self.event_bus.publish("model_download_progress", progress)
@@ -176,6 +181,9 @@ class ApplicationCore:
                 logger.info("Expression map created. Ready to detect keywords.")
                 return session_expression_map
 
+        except aiohttp.ClientError as e:
+            logger.error(f"VTS connection error during expression sync: {e}")
+            await self.event_bus.publish("vts_status_update", f"Error: {e}")
         except Exception as e:
             logger.error(f"Failed to auto-update expressions: {e}")
         return {}

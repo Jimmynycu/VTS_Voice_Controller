@@ -29,7 +29,7 @@ class VTSWebSocketAgent(VTSOutputAgent):
                 logger.info("Connected to VTube Studio.")
                 await self.event_bus.publish("vts_status_update", "Connected")
                 return
-            except Exception as e:
+            except (ConnectionRefusedError, ConnectionError, asyncio.TimeoutError) as e:
                 logger.warning(f"Connection attempt {attempt + 1} of {max_retries} failed: {e}")
                 if attempt < max_retries - 1:
                     logger.info(f"Retrying in {retry_delay} seconds...")

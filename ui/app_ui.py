@@ -8,9 +8,11 @@ from PyQt6.QtWidgets import QApplication
 from ui.main_window import MainWindow
 from core.application_core import ApplicationCore
 
+from core.path_config import get_vts_config_path
+
 def load_initial_config():
     try:
-        with open("vts_config.yaml", 'r') as f:
+        with open(get_vts_config_path(), 'r') as f:
             return yaml.safe_load(f)
     except Exception as e:
         logger.error(f"Failed to load initial config: {e}")
@@ -27,6 +29,7 @@ class AppUI:
         self.main_window.stop_button.clicked.connect(self._stop_button_clicked)
         self.main_window.language_selector.currentTextChanged.connect(self._language_changed)
         self.main_window.closing.connect(self._on_main_window_closing)
+        self.main_window.save_button.clicked.connect(self._save_keywords)
 
         # Initial UI setup
         initial_config = load_initial_config()
@@ -52,6 +55,51 @@ class AppUI:
         logger.info("--- UI: Main window closing ---")
         if self.app_core_task:
             self.app_core_task.cancel()
+
+    def _save_keywords(self):
+        logger.info("--- UI: Save button clicked ---")
+        try:
+            config_path = get_vts_config_path()
+            with open(config_path, 'r') as f:
+                config = yaml.safe_load(f)
+
+            expressions = {}
+            for row in range(self.main_window.keyword_editor.rowCount()):
+                exp_name_item = self.main_window.keyword_editor.item(row, 0)
+                keywords_item = self.main_window.keyword_editor.item(row, 1)
+                cooldown_item = self.main_window.keyword_editor.item(row, 2)
+
+                if exp_name_item and keywords_item and cooldown_item:
+                    exp_name = exp_name_item.text()
+                    keywords = [k.strip() for k in keywords_item.text().split(',')]
+                    cooldown = int(cooldown_item.text())
+
+                    # Find the expression file name
+                    exp_file = None
+                    for file, data in config.get('expressions', {}).items():
+                        if data.get('name') == exp_name:
+                            exp_file = file
+                            break
+
+                    if exp_file:
+                        expressions[exp_file] = {
+                            'name': exp_name,
+                            'keywords': keywords,
+                            'cooldown_s': cooldown
+                        }
+
+            config['expressions'] = expressions
+            with open(config_path, 'w') as f:
+                yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
+
+            logger.info("Keywords saved successfully.")
+            # Optionally, reload the application core or just the intent resolver
+            if self.app_core_task and not self.app_core_task.done():
+                logger.info("Reloading expression map...")
+                asyncio.create_task(self.app_core_task.result()._synchronize_expressions())
+
+        except Exception as e:
+            logger.error(f"Failed to save keywords: {e}")
 
     async def start_application(self):
         self.main_window.set_status(app="Starting...")

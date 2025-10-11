@@ -6,12 +6,12 @@ from qasync import QEventLoop
 from PyQt6.QtWidgets import QApplication
 
 from ui.app_ui import AppUI
+from core.path_config import get_log_dir
 
 def main():
     # --- Setup Logging ---
-    if not os.path.exists("logs"):
-        os.mkdir("logs")
-    log_path = os.path.join("logs", "vts_controller.log")
+    log_dir = get_log_dir()
+    log_path = os.path.join(log_dir, "vts_controller.log")
     logger.add(log_path, rotation="10 MB", retention="7 days", level="INFO", backtrace=True, diagnose=True)
 
     # --- Set up the asyncio event loop for qasync ---

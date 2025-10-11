@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 import yaml
+from core.path_config import get_config_path
 
 class MainWindow(QMainWindow):
     closing = pyqtSignal()
@@ -72,14 +73,18 @@ class MainWindow(QMainWindow):
         self.keyword_editor = QTableWidget()
         self.keyword_editor.setColumnCount(3)
         self.keyword_editor.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+        self.keyword_editor.setSortingEnabled(True)
         self.main_layout.addWidget(self.keyword_editor)
+
+        self.save_button = QPushButton()
+        self.main_layout.addWidget(self.save_button)
 
     def _load_translations(self):
         try:
-            with open("config/translations.yaml", 'r', encoding='utf-8') as f:
+            with open(get_config_path("translations.yaml"), 'r', encoding='utf-8') as f:
                 self.translations = yaml.safe_load(f)
         except FileNotFoundError:
-            self._show_error_and_exit("Configuration file 'config/translations.yaml' not found.")
+            self._show_error_and_exit(f"Configuration file not found: {get_config_path('translations.yaml')}")
         except Exception as e:
             self._show_error_and_exit(f"Failed to load translations: {e}")
 
@@ -111,6 +116,7 @@ class MainWindow(QMainWindow):
         self.provider_label.setText(t["provider"])
         self.start_button.setText(t["start_button"])
         self.stop_button.setText(t["stop_button"])
+        self.save_button.setText(t.get("save_button", "Save Keywords"))
         self.transcription_log.setPlaceholderText(t["log_placeholder"])
         self.keyword_editor.setHorizontalHeaderLabels([
             t["header_expression"], t["header_keywords"], t["header_cooldown"]
@@ -138,4 +144,6 @@ class MainWindow(QMainWindow):
             self.keyword_editor.setItem(row, 0, QTableWidgetItem(exp_data.get('name', 'N/A')))
             self.keyword_editor.setItem(row, 1, QTableWidgetItem(", ".join(exp_data.get('keywords', []))))
             self.keyword_editor.setItem(row, 2, QTableWidgetItem(str(exp_data.get('cooldown_s', 'N/A'))))
+            # Make the first column read-only
+            self.keyword_editor.item(row, 0).setFlags(self.keyword_editor.item(row, 0).flags() & ~Qt.ItemFlag.ItemIsEditable)
             row += 1

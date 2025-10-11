@@ -104,6 +104,7 @@ class ASRProcessor(InputProcessor):
             return text_to_return
 
     async def _audio_callback(self, indata, frames, time, status):
+        logger.trace(f"Audio callback received {frames} frames.")
         if status:
             logger.warning(status)
 
@@ -116,9 +117,11 @@ class ASRProcessor(InputProcessor):
             frame = self.vad_buffer[:self.vad_frame_size * 2]
             self.vad_buffer = self.vad_buffer[self.vad_frame_size * 2:]
 
+            logger.trace("Checking frame for speech with VAD.")
             is_speech = self.vad.is_speech(frame, self.SAMPLE_RATE)
 
             if is_speech:
+                logger.trace("Speech detected, adding to ASR buffer.")
                 # If speech is detected, append to the ASR buffer
                 async with self.buffer_lock:
                     # Convert back to float32 for ASR if needed, or handle directly if ASR accepts int16
@@ -136,12 +139,14 @@ class ASRProcessor(InputProcessor):
 
         async def process_audio_buffer_periodically():
             while True:
-                await asyncio.sleep(0.05)  # Process buffer every 0.05 seconds (50ms)
+                await asyncio.sleep(0.02)  # Process buffer every 0.02 seconds (20ms)
                 async with self.buffer_lock:
                     if self.audio_buffer.size > 0:
+                        logger.trace("Processing audio buffer.")
                         await self.event_bus.publish("asr_status_update", "Transcribing")
                         transcribed_text = self._transcribe_np(self.audio_buffer)
                         if transcribed_text:
+                            logger.trace(f"Transcription received: {transcribed_text}")
                             await self.event_bus.publish("transcription_received", transcribed_text)
                         self.audio_buffer = np.array([], dtype=np.float32)  # Clear the buffer
                         await self.event_bus.publish("asr_status_update", "Listening")
