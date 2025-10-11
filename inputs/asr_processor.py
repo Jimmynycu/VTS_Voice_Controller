@@ -139,7 +139,7 @@ class ASRProcessor(InputProcessor):
 
         async def process_audio_buffer_periodically():
             while True:
-                await asyncio.sleep(0.02)  # Process buffer every 0.02 seconds (20ms)
+                await asyncio.sleep(0.05)  # Process buffer every 0.05 seconds (50ms)
                 async with self.buffer_lock:
                     if self.audio_buffer.size > 0:
                         logger.trace("Processing audio buffer.")
