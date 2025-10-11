@@ -13,12 +13,12 @@ from inputs.asr_processor import ASRProcessor
 from inputs.utils.utils import ensure_model_downloaded_and_extracted
 
 class ApplicationCore:
-    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en", event_bus: EventBus = None):
+    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en"):
         self.config_path = config_path
         self.test_mode = test_mode
         self.recognition_mode = recognition_mode
         self.language = language
-        self.event_bus = event_bus or EventBus()
+        self.event_bus = EventBus()
         self.config = self._load_config()
         self.vts_agent = None
         self.intent_resolver = None
@@ -126,7 +126,9 @@ class ApplicationCore:
                 base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_base_dir = os.path.join(base_path, "models")
 
-            progress_callback = lambda progress: self.event_bus.publish("model_download_progress", progress)
+            async def progress_callback(progress):
+                await self.event_bus.publish("model_download_progress", progress)
+
             actual_model_dir = await ensure_model_downloaded_and_extracted(model_url, model_base_dir, progress_callback)
 
             self.input_processor = ASRProcessor(

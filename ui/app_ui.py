@@ -60,8 +60,7 @@ class AppUI:
         app_core = ApplicationCore(
             config_path="vts_config.yaml",
             recognition_mode=recognition_mode,
-            language=language,
-            event_bus=EventBus()
+            language=language
         )
 
         # Setup listeners on the running instance
@@ -107,7 +106,7 @@ class AppUI:
                     self.main_window.progress_bar.setVisible(True)
                     self.main_window.progress_bar.setRange(0, 100)
                     self.main_window.progress_bar.setValue(0)
-                elif progress == 100:
+                elif progress >= 100:
                     self.main_window.progress_bar.setVisible(False)
                 else:
                     self.main_window.progress_bar.setValue(progress)
