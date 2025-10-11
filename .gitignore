@@ -20,3 +20,6 @@ models/
 # Plan files
 plan.txt
 step.txt
+
+.delta
+GEMINI.md

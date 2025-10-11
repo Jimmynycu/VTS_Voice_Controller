@@ -84,3 +84,13 @@ To ensure a clean and isolated environment, it is highly recommended to use a Py
 4.  **Configure Keywords:**
     - Open `vts_config.yaml`.
     - Change the placeholder keywords (e.g., `NEW_KEYWORD_MyExpression`) to the voice commands you want to use.
+
+---
+
+# Gemini Playbook
+
+This section contains a set of rules and best practices for the Gemini agent to follow, derived from previous interactions and tasks.
+
+## Rules
+
+- When integrating a synchronous GUI framework with an `asyncio` core, always configure the main application entry point with the appropriate asynchronous event loop manager (e.g., `qasync.QEventLoop`) before implementing any UI event handlers or core interactions.
