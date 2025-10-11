@@ -11,7 +11,7 @@ zh:
   decoder: "decoder-epoch-99-avg-1.int8.onnx"
   joiner: "joiner-epoch-99-avg-1.int8.onnx"
 ja:
-  url: "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ja-2023-05-28.tar.bz2"
+  url: "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-zipformer-ja-reazonspeech-2024-08-01.tar.bz2"
   tokens: "tokens.txt"
   encoder: "encoder-epoch-99-avg-1.onnx"
   decoder: "decoder-epoch-99-avg-1.onnx"

@@ -1,6 +1,7 @@
+import sys
 from PyQt6.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QTextEdit, QTableWidget,
-    QTableWidgetItem, QLabel, QPushButton, QHeaderView, QComboBox, QProgressBar
+    QTableWidgetItem, QLabel, QPushButton, QHeaderView, QComboBox, QProgressBar, QMessageBox
 )
 from PyQt6.QtCore import Qt, pyqtSignal
 import yaml
@@ -77,25 +78,19 @@ class MainWindow(QMainWindow):
         try:
             with open("config/translations.yaml", 'r', encoding='utf-8') as f:
                 self.translations = yaml.safe_load(f)
+        except FileNotFoundError:
+            self._show_error_and_exit("Configuration file 'config/translations.yaml' not found.")
         except Exception as e:
-            # Fallback to a minimal set of translations if the file is missing or invalid
-            self.translations = {
-                "en": {
-                    "window_title": "VTS Voice Controller",
-                    "vts_status_disconnected": "Disconnected",
-                    "asr_status_idle": "Idle",
-                    "app_status_stopped": "Stopped",
-                    "recognition_mode": "Recognition Mode:",
-                    "language": "Language:",
-                    "provider": "Provider:",
-                    "start_button": "Start Application",
-                    "stop_button": "Stop Application",
-                    "log_placeholder": "Live Transcription Output...",
-                    "header_expression": "Expression Name",
-                    "header_keywords": "Keywords",
-                    "header_cooldown": "Cooldown (s)"
-                }
-            }
+            self._show_error_and_exit(f"Failed to load translations: {e}")
+
+    def _show_error_and_exit(self, message):
+        error_box = QMessageBox()
+        error_box.setIcon(QMessageBox.Icon.Critical)
+        error_box.setText(message)
+        error_box.setWindowTitle("Configuration Error")
+        error_box.setStandardButtons(QMessageBox.StandardButton.Ok)
+        error_box.exec()
+        sys.exit(1)
 
     def retranslate_ui(self, language: str):
         # Populate language selector
