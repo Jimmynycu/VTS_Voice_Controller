@@ -4,7 +4,7 @@ import tarfile
 from tqdm import tqdm
 from loguru import logger
 
-def ensure_model_downloaded_and_extracted(model_url: str, model_base_dir: str) -> str:
+async def ensure_model_downloaded_and_extracted(model_url: str, model_base_dir: str, progress_callback=None) -> str:
     """Downloads and extracts the ASR model if not already present."""
     model_name = model_url.split("/")[-1].replace(".tar.bz2", "")
     model_dir = os.path.join(model_base_dir, model_name)
@@ -23,16 +23,22 @@ def ensure_model_downloaded_and_extracted(model_url: str, model_base_dir: str) -
         with requests.get(model_url, stream=True) as r:
             r.raise_for_status()
             total_size = int(r.headers.get('content-length', 0))
-            with open(archive_path, 'wb') as f, tqdm(
-                desc=model_name,
-                total=total_size,
-                unit='iB',
-                unit_scale=True,
-                unit_divisor=1024,
-            ) as bar:
+            downloaded_size = 0
+
+            if progress_callback:
+                progress_callback(0)
+
+            with open(archive_path, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192):
                     size = f.write(chunk)
-                    bar.update(size)
+                    downloaded_size += size
+                    if progress_callback and total_size > 0:
+                        progress = int((downloaded_size / total_size) * 100)
+                        progress_callback(progress)
+
+            if progress_callback:
+                progress_callback(100) # Signal completion
+
         logger.info("Download complete.")
     except Exception as e:
         logger.error(f"Failed to download model: {e}")

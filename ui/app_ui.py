@@ -25,6 +25,7 @@ class AppUI:
         # Connect signals to synchronous slots
         self.main_window.start_button.clicked.connect(self._start_button_clicked)
         self.main_window.stop_button.clicked.connect(self._stop_button_clicked)
+        self.main_window.language_selector.currentTextChanged.connect(self._language_changed)
 
         # Initial UI setup
         initial_config = load_initial_config()
@@ -43,16 +44,24 @@ class AppUI:
         if self.app_core_task:
             self.app_core_task.cancel()
 
+    def _language_changed(self, language_code: str):
+        self.main_window.retranslate_ui(language_code)
+
     async def start_application(self):
         self.main_window.set_status(app="Starting...")
         self.main_window.start_button.setEnabled(False)
         self.main_window.mode_selector.setEnabled(False)
+        self.main_window.language_selector.setEnabled(False)
         self.main_window.stop_button.setEnabled(True)
 
         recognition_mode = self.main_window.mode_selector.currentText()
+        language = self.main_window.language_selector.currentText()
+
         app_core = ApplicationCore(
             config_path="vts_config.yaml",
-            recognition_mode=recognition_mode
+            recognition_mode=recognition_mode,
+            language=language,
+            event_bus=EventBus()
         )
 
         # Setup listeners on the running instance
@@ -61,6 +70,7 @@ class AppUI:
         vts_status_queue = await app_core.event_bus.subscribe("vts_status_update")
         asr_status_queue = await app_core.event_bus.subscribe("asr_status_update")
         asr_ready_queue = await app_core.event_bus.subscribe("asr_ready")
+        model_download_queue = await app_core.event_bus.subscribe("model_download_progress")
 
         listener_tasks = [
             asyncio.create_task(self._handle_transcription_events(transcription_queue)),
@@ -68,6 +78,7 @@ class AppUI:
             asyncio.create_task(self._handle_vts_status_events(vts_status_queue)),
             asyncio.create_task(self._handle_asr_status_events(asr_status_queue)),
             asyncio.create_task(self._handle_asr_ready_events(asr_ready_queue)),
+            asyncio.create_task(self._handle_model_download_events(model_download_queue)),
         ]
 
         try:
@@ -83,7 +94,26 @@ class AppUI:
             self.main_window.set_status(app="Stopped", vts="Disconnected", asr="Idle")
             self.main_window.start_button.setEnabled(True)
             self.main_window.mode_selector.setEnabled(True)
+            self.main_window.language_selector.setEnabled(True)
             self.main_window.stop_button.setEnabled(False)
+            self.main_window.progress_bar.setVisible(False)
+
+    async def _handle_model_download_events(self, queue: asyncio.Queue):
+        while True:
+            try:
+                event = await queue.get()
+                progress = event.payload
+                if progress == 0:
+                    self.main_window.progress_bar.setVisible(True)
+                    self.main_window.progress_bar.setRange(0, 100)
+                    self.main_window.progress_bar.setValue(0)
+                elif progress == 100:
+                    self.main_window.progress_bar.setVisible(False)
+                else:
+                    self.main_window.progress_bar.setValue(progress)
+                queue.task_done()
+            except asyncio.CancelledError:
+                break
 
     async def _handle_transcription_events(self, queue: asyncio.Queue):
         while True:

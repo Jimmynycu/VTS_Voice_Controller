@@ -13,13 +13,12 @@ from inputs.asr_processor import ASRProcessor
 from inputs.utils.utils import ensure_model_downloaded_and_extracted
 
 class ApplicationCore:
-    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast"):
+    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en", event_bus: EventBus = None):
         self.config_path = config_path
         self.test_mode = test_mode
         self.recognition_mode = recognition_mode
-        self.config_path = config_path
-        self.test_mode = test_mode
-        self.event_bus = EventBus()
+        self.language = language
+        self.event_bus = event_bus or EventBus()
         self.config = self._load_config()
         self.vts_agent = None
         self.intent_resolver = None
@@ -91,20 +90,33 @@ class ApplicationCore:
         else:
             logger.info("--- RUNNING IN NORMAL MODE (MICROPHONE INPUT) ---")
             # This is where the real ASRProcessor is initialized
-            from inputs.utils.utils import ensure_model_downloaded_and_extracted
             model_config = {
-                "english": {
+                "en": {
                     "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17.tar.bz2",
                     "tokens": "tokens.txt",
                     "encoder": "encoder-epoch-99-avg-1.int8.onnx",
                     "decoder": "decoder-epoch-99-avg-1.int8.onnx",
                     "joiner": "joiner-epoch-99-avg-1.int8.onnx",
+                },
+                "zh": {
+                    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2",
+                    "tokens": "tokens.txt",
+                    "encoder": "encoder-epoch-99-avg-1.int8.onnx",
+                    "decoder": "decoder-epoch-99-avg-1.int8.onnx",
+                    "joiner": "joiner-epoch-99-avg-1.int8.onnx",
+                },
+                "ja": {
+                    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ja-2023-05-28.tar.bz2",
+                    "tokens": "tokens.txt",
+                    "encoder": "encoder-epoch-99-avg-1.onnx",
+                    "decoder": "decoder-epoch-99-avg-1.onnx",
+                    "joiner": "joiner-epoch-99-avg-1.onnx",
                 }
             }
-            language = "english"  # Default language
-            selected_model = model_config.get(language.lower())
+
+            selected_model = model_config.get(self.language.lower())
             if not selected_model:
-                logger.error(f"Language '{language}' not supported. Please check the model_config.")
+                logger.error(f"Language '{self.language}' not supported. Please check the model_config.")
                 return
 
             model_url = selected_model["url"]
@@ -113,8 +125,9 @@ class ApplicationCore:
             else:
                 base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_base_dir = os.path.join(base_path, "models")
-            
-            actual_model_dir = ensure_model_downloaded_and_extracted(model_url, model_base_dir)
+
+            progress_callback = lambda progress: self.event_bus.publish("model_download_progress", progress)
+            actual_model_dir = await ensure_model_downloaded_and_extracted(model_url, model_base_dir, progress_callback)
 
             self.input_processor = ASRProcessor(
                 event_bus=self.event_bus,
