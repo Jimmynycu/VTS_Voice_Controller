@@ -1587,3 +1587,126 @@
 2025-10-11 00:45:36.465 | INFO     | ui.app_ui:_stop_button_clicked:42 - --- UI: Stop button clicked ---
 2025-10-11 00:45:36.523 | INFO     | core.application_core:run:221 - Application tasks were cancelled.
 2025-10-11 00:45:36.524 | INFO     | agents.vts_output_agent:disconnect:89 - Disconnected from VTube Studio.
+2025-10-11 15:36:15.298 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 15:49:04.416 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 15:49:10.351 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:11.405 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:11.681 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:11.826 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:11.974 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.125 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.263 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.415 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.564 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.711 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:12.870 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:13.013 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:13.193 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:13.341 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:13.488 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:13.649 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:14.184 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:14.335 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:14.476 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:15.559 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:15.696 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:15.851 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:16.004 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 15:49:16.160 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 16:10:27.134 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 16:10:29.453 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 16:10:29.453 | INFO     | ui.app_ui:start_application:86 - Application core task was cancelled by UI.
+2025-10-11 16:10:31.880 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 16:10:34.728 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 16:10:34.728 | INFO     | ui.app_ui:start_application:86 - Application core task was cancelled by UI.
+2025-10-11 16:10:36.667 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 16:10:40.646 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked ---
+2025-10-11 16:10:40.646 | INFO     | ui.app_ui:start_application:86 - Application core task was cancelled by UI.
+2025-10-11 16:13:38.360 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked ---
+2025-10-11 16:16:37.662 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked by Start Application ---
+2025-10-11 16:16:41.748 | WARNING  | agents.vts_output_agent:connect:33 - Connection attempt 1 of 5 failed: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:16:41.749 | INFO     | agents.vts_output_agent:connect:35 - Retrying in 5 seconds...
+2025-10-11 16:16:50.835 | WARNING  | agents.vts_output_agent:connect:33 - Connection attempt 2 of 5 failed: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:16:50.835 | INFO     | agents.vts_output_agent:connect:35 - Retrying in 5 seconds...
+2025-10-11 16:16:59.865 | WARNING  | agents.vts_output_agent:connect:33 - Connection attempt 3 of 5 failed: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:16:59.866 | INFO     | agents.vts_output_agent:connect:35 - Retrying in 5 seconds...
+2025-10-11 16:17:08.932 | WARNING  | agents.vts_output_agent:connect:33 - Connection attempt 4 of 5 failed: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:17:08.932 | INFO     | agents.vts_output_agent:connect:35 - Retrying in 5 seconds...
+2025-10-11 16:17:17.972 | WARNING  | agents.vts_output_agent:connect:33 - Connection attempt 5 of 5 failed: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:17:17.972 | ERROR    | agents.vts_output_agent:connect:38 - Could not connect to VTube Studio after all retries.
+2025-10-11 16:17:17.972 | ERROR    | agents.vts_output_agent:connect:39 - Please ensure VTube Studio is running and the API is enabled on port 8001.
+2025-10-11 16:17:17.972 | ERROR    | ui.app_ui:start_application:88 - An error occurred in the application core: [WinError 1225] 遠端電腦拒絕網路連線。
+2025-10-11 16:21:38.008 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked by Start Application ---
+2025-10-11 16:21:40.822 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked by Stop Application ---
+2025-10-11 16:21:40.823 | INFO     | ui.app_ui:start_application:86 - Application core task was cancelled by UI.
+2025-10-11 16:24:28.738 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked by 启动应用 ---
+2025-10-11 16:24:30.798 | INFO     | agents.vts_output_agent:connect:29 - Connected to VTube Studio.
+2025-10-11 16:24:30.848 | INFO     | agents.vts_output_agent:authenticate:50 - Authenticated successfully with VTube Studio.
+2025-10-11 16:24:30.849 | INFO     | core.application_core:_synchronize_expressions:145 - Checking for expression updates from VTube Studio...
+2025-10-11 16:24:30.849 | INFO     | agents.vts_output_agent:get_hotkey_list:75 - Requesting hotkey list from VTube Studio...
+2025-10-11 16:24:30.876 | INFO     | core.application_core:_synchronize_expressions:196 - Expression map created. Ready to detect keywords.
+2025-10-11 16:24:30.876 | INFO     | core.application_core:_initialize_components:91 - --- RUNNING IN NORMAL MODE (MICROPHONE INPUT) ---
+2025-10-11 16:24:30.876 | INFO     | inputs.utils.utils:ensure_model_downloaded_and_extracted:19 - Downloading ASR model from https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2...
+2025-10-11 16:25:55.470 | INFO     | inputs.utils.utils:ensure_model_downloaded_and_extracted:44 - Download complete.
+2025-10-11 16:25:55.470 | INFO     | inputs.utils.utils:ensure_model_downloaded_and_extracted:46 - Extracting model to F:\VTS_Voice_Controller\models\sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20...
+2025-10-11 16:26:28.034 | INFO     | inputs.utils.utils:ensure_model_downloaded_and_extracted:49 - Extraction complete.
+2025-10-11 16:26:28.092 | INFO     | inputs.asr_processor:__init__:47 - Sherpa-Onnx-ASR: Using cpu for inference
+2025-10-11 16:26:34.882 | INFO     | core.application_core:run:216 - Starting application components...
+2025-10-11 16:26:34.884 | INFO     | inputs.asr_processor:process_input:130 - Starting microphone stream...
+2025-10-11 16:26:34.922 | INFO     | inputs.asr_processor:process_input:156 - Microphone stream started. Say something!
+2025-10-11 16:27:13.055 | INFO     | ui.app_ui:_stop_button_clicked:43 - --- UI: Stop button clicked by 停止应用 ---
+2025-10-11 16:27:13.105 | INFO     | core.application_core:run:236 - Application tasks were cancelled.
+2025-10-11 16:27:13.108 | INFO     | agents.vts_output_agent:disconnect:89 - Disconnected from VTube Studio.
+2025-10-11 16:27:15.004 | INFO     | ui.app_ui:_start_button_clicked:38 - --- UI: Start button clicked by Start Application ---
+2025-10-11 16:27:17.038 | INFO     | agents.vts_output_agent:connect:29 - Connected to VTube Studio.
+2025-10-11 16:27:17.048 | INFO     | agents.vts_output_agent:authenticate:50 - Authenticated successfully with VTube Studio.
+2025-10-11 16:27:17.048 | INFO     | core.application_core:_synchronize_expressions:145 - Checking for expression updates from VTube Studio...
+2025-10-11 16:27:17.048 | INFO     | agents.vts_output_agent:get_hotkey_list:75 - Requesting hotkey list from VTube Studio...
+2025-10-11 16:27:17.061 | INFO     | core.application_core:_synchronize_expressions:196 - Expression map created. Ready to detect keywords.
+2025-10-11 16:27:17.061 | INFO     | core.application_core:_initialize_components:91 - --- RUNNING IN NORMAL MODE (MICROPHONE INPUT) ---
+2025-10-11 16:27:17.061 | INFO     | inputs.utils.utils:ensure_model_downloaded_and_extracted:14 - ✅ Model already extracted at F:\VTS_Voice_Controller\models\sherpa-onnx-streaming-zipformer-en-20M-2023-02-17.
+2025-10-11 16:27:17.061 | INFO     | inputs.asr_processor:__init__:47 - Sherpa-Onnx-ASR: Using cpu for inference
+2025-10-11 16:27:19.854 | INFO     | core.application_core:run:216 - Starting application components...
+2025-10-11 16:27:19.860 | INFO     | inputs.asr_processor:process_input:130 - Starting microphone stream...
+2025-10-11 16:27:19.871 | INFO     | inputs.asr_processor:process_input:156 - Microphone stream started. Say something!
+2025-10-11 16:27:27.748 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: Y ANG
+2025-10-11 16:27:29.483 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: Y ANGRY ANGRY
+2025-10-11 16:27:29.483 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'angry' detected. Triggering expression: 937bc0c1af794cdca15ded0c34981894
+2025-10-11 16:27:35.660 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: ANGRY
+2025-10-11 16:27:35.660 | WARNING  | core.intent_resolver:_process_one_event:40 - Expression 937bc0c1af794cdca15ded0c34981894 triggered twice consecutively. Placing on cooldown for 60 seconds.
+2025-10-11 16:27:35.660 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'angry' detected. Triggering expression: 937bc0c1af794cdca15ded0c34981894
+2025-10-11 16:27:35.689 | INFO     | agents.vts_output_agent:trigger_hotkey:67 - Triggered hotkey: 937bc0c1af794cdca15ded0c34981894
+2025-10-11 16:27:37.283 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: ANGRY ANGRY ANG
+2025-10-11 16:27:37.283 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 58.4 more seconds.
+2025-10-11 16:27:37.283 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 58.4 more seconds.
+2025-10-11 16:27:38.182 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: A
+2025-10-11 16:27:40.321 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: ANGRY SHOCK
+2025-10-11 16:27:40.321 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 55.3 more seconds.
+2025-10-11 16:27:40.321 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 55.3 more seconds.
+2025-10-11 16:27:40.321 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'shock' detected. Triggering expression: 40209f606adc4ca4a6e7df620f735bf7
+2025-10-11 16:27:50.409 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: ANGRY SHOCK SHOCK SHOCK
+2025-10-11 16:27:50.410 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 45.3 more seconds.
+2025-10-11 16:27:50.410 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Angry' detected, but expression 937bc0c1af794cdca15ded0c34981894 is on cooldown for 45.3 more seconds.
+2025-10-11 16:27:50.410 | WARNING  | core.intent_resolver:_process_one_event:40 - Expression 40209f606adc4ca4a6e7df620f735bf7 triggered twice consecutively. Placing on cooldown for 60 seconds.
+2025-10-11 16:27:50.410 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'shock' detected. Triggering expression: 40209f606adc4ca4a6e7df620f735bf7
+2025-10-11 16:27:50.433 | INFO     | agents.vts_output_agent:trigger_hotkey:67 - Triggered hotkey: 40209f606adc4ca4a6e7df620f735bf7
+2025-10-11 16:27:52.627 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: SHOCK
+2025-10-11 16:27:52.627 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 57.8 more seconds.
+2025-10-11 16:27:52.627 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 57.8 more seconds.
+2025-10-11 16:27:55.292 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: SHOCK SHOCK SHOCK
+2025-10-11 16:27:55.292 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 55.1 more seconds.
+2025-10-11 16:27:55.292 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 55.1 more seconds.
+2025-10-11 16:27:59.917 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: SHOCK
+2025-10-11 16:27:59.917 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 50.5 more seconds.
+2025-10-11 16:27:59.917 | INFO     | core.intent_resolver:_process_one_event:28 - Keyword 'Shock' detected, but expression 40209f606adc4ca4a6e7df620f735bf7 is on cooldown for 50.5 more seconds.
+2025-10-11 16:28:01.356 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: SHOCK ICE CRY
+2025-10-11 16:28:01.357 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'cry' detected. Triggering expression: 0b01a1f89bca4dfcaedc4f892a7d5dce
+2025-10-11 16:28:04.018 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: SHOCK ICE CRY ICE CRY
+2025-10-11 16:28:04.018 | WARNING  | core.intent_resolver:_process_one_event:40 - Expression 0b01a1f89bca4dfcaedc4f892a7d5dce triggered twice consecutively. Placing on cooldown for 60 seconds.
+2025-10-11 16:28:04.018 | INFO     | core.intent_resolver:_process_one_event:42 - Keyword 'cry' detected. Triggering expression: 0b01a1f89bca4dfcaedc4f892a7d5dce
+2025-10-11 16:28:04.101 | INFO     | agents.vts_output_agent:trigger_hotkey:67 - Triggered hotkey: 0b01a1f89bca4dfcaedc4f892a7d5dce
+2025-10-11 16:28:08.830 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: HEART EYES
+2025-10-11 16:28:12.668 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: HEART EYES ARE TO ICE
+2025-10-11 16:28:15.413 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: HEART EYES ARE TO ICE BOUQUET
+2025-10-11 16:28:16.237 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: BOUX
+2025-10-11 16:28:24.322 | INFO     | core.intent_resolver:_process_one_event:21 - Transcribed: BOUX OGAY

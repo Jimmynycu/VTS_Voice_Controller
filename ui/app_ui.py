@@ -23,8 +23,8 @@ class AppUI:
         self.app_core_task = None
 
         # Connect signals to synchronous slots
-        self.main_window.start_button.clicked.connect(self._start_button_clicked)
-        self.main_window.stop_button.clicked.connect(self._stop_button_clicked)
+        self.main_window.start_button.clicked.connect(lambda: self._start_button_clicked(self.main_window.start_button))
+        self.main_window.stop_button.clicked.connect(lambda: self._stop_button_clicked(self.main_window.stop_button))
         self.main_window.language_selector.currentTextChanged.connect(self._language_changed)
 
         # Initial UI setup
@@ -34,13 +34,13 @@ class AppUI:
         
         self.main_window.show()
 
-    def _start_button_clicked(self):
-        logger.info("--- UI: Start button clicked ---")
+    def _start_button_clicked(self, sender):
+        logger.info(f"--- UI: Start button clicked by {sender.text()} ---")
         # This synchronous method creates the async task
         self.app_core_task = asyncio.create_task(self.start_application())
 
-    def _stop_button_clicked(self):
-        logger.info("--- UI: Stop button clicked ---")
+    def _stop_button_clicked(self, sender):
+        logger.info(f"--- UI: Stop button clicked by {sender.text()} ---")
         if self.app_core_task:
             self.app_core_task.cancel()
 
