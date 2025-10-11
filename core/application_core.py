@@ -13,11 +13,12 @@ from inputs.asr_processor import ASRProcessor
 from inputs.utils.utils import ensure_model_downloaded_and_extracted
 
 class ApplicationCore:
-    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en"):
+    def __init__(self, config_path: str, test_mode: bool = False, recognition_mode: str = "fast", language: str = "en", provider: str = "cpu"):
         self.config_path = config_path
         self.test_mode = test_mode
         self.recognition_mode = recognition_mode
         self.language = language
+        self.provider = provider
         self.event_bus = EventBus()
         self.config = self._load_config()
         self.vts_agent = None
@@ -90,29 +91,8 @@ class ApplicationCore:
         else:
             logger.info("--- RUNNING IN NORMAL MODE (MICROPHONE INPUT) ---")
             # This is where the real ASRProcessor is initialized
-            model_config = {
-                "en": {
-                    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-en-20M-2023-02-17.tar.bz2",
-                    "tokens": "tokens.txt",
-                    "encoder": "encoder-epoch-99-avg-1.int8.onnx",
-                    "decoder": "decoder-epoch-99-avg-1.int8.onnx",
-                    "joiner": "joiner-epoch-99-avg-1.int8.onnx",
-                },
-                "zh": {
-                    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2",
-                    "tokens": "tokens.txt",
-                    "encoder": "encoder-epoch-99-avg-1.int8.onnx",
-                    "decoder": "decoder-epoch-99-avg-1.int8.onnx",
-                    "joiner": "joiner-epoch-99-avg-1.int8.onnx",
-                },
-                "ja": {
-                    "url": "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ja-2023-05-28.tar.bz2",
-                    "tokens": "tokens.txt",
-                    "encoder": "encoder-epoch-99-avg-1.onnx",
-                    "decoder": "decoder-epoch-99-avg-1.onnx",
-                    "joiner": "joiner-epoch-99-avg-1.onnx",
-                }
-            }
+            with open("config/models.yaml", 'r') as f:
+                model_config = yaml.safe_load(f)
 
             selected_model = model_config.get(self.language.lower())
             if not selected_model:
@@ -137,7 +117,7 @@ class ApplicationCore:
                 encoder_path=os.path.join(actual_model_dir, selected_model["encoder"]),
                 decoder_path=os.path.join(actual_model_dir, selected_model["decoder"]),
                 joiner_path=os.path.join(actual_model_dir, selected_model["joiner"]),
-                provider="cpu", # Defaulting to CPU for broader compatibility
+                provider=self.provider,
                 recognition_mode=self.recognition_mode,
             )
 

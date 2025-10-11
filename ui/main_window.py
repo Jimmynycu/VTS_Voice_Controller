@@ -2,9 +2,12 @@ from PyQt6.QtWidgets import (
     QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QTextEdit, QTableWidget,
     QTableWidgetItem, QLabel, QPushButton, QHeaderView, QComboBox, QProgressBar
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
+import yaml
 
 class MainWindow(QMainWindow):
+    closing = pyqtSignal()
+
     def __init__(self):
         super().__init__()
 
@@ -13,6 +16,7 @@ class MainWindow(QMainWindow):
         self.main_layout = QVBoxLayout(self.central_widget)
 
         self._init_ui_elements()
+        self._load_translations()
         self.retranslate_ui("en") # Set initial language to English
 
     def _init_ui_elements(self):
@@ -38,6 +42,10 @@ class MainWindow(QMainWindow):
         self.language_label = QLabel()
         self.language_selector = QComboBox()
 
+        self.provider_label = QLabel()
+        self.provider_selector = QComboBox()
+        self.provider_selector.addItems(["cpu", "cuda"])
+
         controls_layout.addWidget(self.start_button)
         controls_layout.addWidget(self.stop_button)
         controls_layout.addStretch()
@@ -45,6 +53,8 @@ class MainWindow(QMainWindow):
         controls_layout.addWidget(self.mode_selector)
         controls_layout.addWidget(self.language_label)
         controls_layout.addWidget(self.language_selector)
+        controls_layout.addWidget(self.provider_label)
+        controls_layout.addWidget(self.provider_selector)
         self.main_layout.addLayout(controls_layout)
 
         # Download Progress Bar
@@ -63,54 +73,31 @@ class MainWindow(QMainWindow):
         self.keyword_editor.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         self.main_layout.addWidget(self.keyword_editor)
 
-    def retranslate_ui(self, language: str):
-        # This will be expanded with a proper localization system later.
-        # For now, we'll use a simple dictionary for demonstration.
-        self.translations = {
-            "en": {
-                "window_title": "VTS Voice Controller",
-                "vts_status_disconnected": "Disconnected",
-                "asr_status_idle": "Idle",
-                "app_status_stopped": "Stopped",
-                "recognition_mode": "Recognition Mode:",
-                "language": "Language:",
-                "start_button": "Start Application",
-                "stop_button": "Stop Application",
-                "log_placeholder": "Live Transcription Output...",
-                "header_expression": "Expression Name",
-                "header_keywords": "Keywords",
-                "header_cooldown": "Cooldown (s)"
-            },
-            "zh": {
-                "window_title": "VTS语音控制器",
-                "vts_status_disconnected": "已断开",
-                "asr_status_idle": "空闲",
-                "app_status_stopped": "已停止",
-                "recognition_mode": "识别模式:",
-                "language": "语言:",
-                "start_button": "启动应用",
-                "stop_button": "停止应用",
-                "log_placeholder": "实时语音识别输出...",
-                "header_expression": "表情名称",
-                "header_keywords": "关键词",
-                "header_cooldown": "冷却(秒)"
-            },
-            "ja": {
-                "window_title": "VTS音声コントローラー",
-                "vts_status_disconnected": "切断されました",
-                "asr_status_idle": "アイドル",
-                "app_status_stopped": "停止",
-                "recognition_mode": "認識モード:",
-                "language": "言語:",
-                "start_button": "アプリケーションを開始",
-                "stop_button": "アプリケーションを停止",
-                "log_placeholder": "ライブ文字起こし出力...",
-                "header_expression": "表情名",
-                "header_keywords": "キーワード",
-                "header_cooldown": "クールダウン(秒)"
+    def _load_translations(self):
+        try:
+            with open("config/translations.yaml", 'r', encoding='utf-8') as f:
+                self.translations = yaml.safe_load(f)
+        except Exception as e:
+            # Fallback to a minimal set of translations if the file is missing or invalid
+            self.translations = {
+                "en": {
+                    "window_title": "VTS Voice Controller",
+                    "vts_status_disconnected": "Disconnected",
+                    "asr_status_idle": "Idle",
+                    "app_status_stopped": "Stopped",
+                    "recognition_mode": "Recognition Mode:",
+                    "language": "Language:",
+                    "provider": "Provider:",
+                    "start_button": "Start Application",
+                    "stop_button": "Stop Application",
+                    "log_placeholder": "Live Transcription Output...",
+                    "header_expression": "Expression Name",
+                    "header_keywords": "Keywords",
+                    "header_cooldown": "Cooldown (s)"
+                }
             }
-        }
 
+    def retranslate_ui(self, language: str):
         # Populate language selector
         if self.language_selector.count() == 0:
             self.language_selector.addItems(self.translations.keys())
@@ -126,6 +113,7 @@ class MainWindow(QMainWindow):
         )
         self.mode_label.setText(t["recognition_mode"])
         self.language_label.setText(t["language"])
+        self.provider_label.setText(t["provider"])
         self.start_button.setText(t["start_button"])
         self.stop_button.setText(t["stop_button"])
         self.transcription_log.setPlaceholderText(t["log_placeholder"])
@@ -133,13 +121,20 @@ class MainWindow(QMainWindow):
             t["header_expression"], t["header_keywords"], t["header_cooldown"]
         ])
 
+    def closeEvent(self, event):
+        self.closing.emit()
+        super().closeEvent(event)
+
     def append_log(self, text: str):
         self.transcription_log.append(text)
 
     def set_status(self, vts: str = None, asr: str = None, app: str = None):
-        if vts: self.vts_status_label.setText(f"VTS Status: {vts}")
-        if asr: self.asr_status_label.setText(f"ASR Status: {asr}")
-        if app: self.app_status_label.setText(f"App Status: {app}")
+        lang_code = self.language_selector.currentText() if self.language_selector.count() > 0 else "en"
+        t = self.translations.get(lang_code, self.translations["en"])
+
+        if vts: self.vts_status_label.setText(f"{t.get('vts_status', 'VTS Status:')} {vts}")
+        if asr: self.asr_status_label.setText(f"{t.get('asr_status', 'ASR Status:')} {asr}")
+        if app: self.app_status_label.setText(f"{t.get('app_status', 'App Status:')} {app}")
 
     def populate_keyword_editor(self, expressions: dict):
         self.keyword_editor.setRowCount(len(expressions))

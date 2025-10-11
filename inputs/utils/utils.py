@@ -48,8 +48,14 @@ async def ensure_model_downloaded_and_extracted(model_url: str, model_base_dir: 
             tar.extractall(path=model_base_dir)
         logger.info("Extraction complete.")
 
+    except aiohttp.ClientError as e:
+        logger.error(f"Failed to download model: {e}")
+        raise
+    except tarfile.TarError as e:
+        logger.error(f"Failed to extract model: {e}")
+        raise
     except Exception as e:
-        logger.error(f"Failed to download or extract model: {e}")
+        logger.error(f"An unexpected error occurred during model download/extraction: {e}")
         raise
     finally:
         if os.path.exists(archive_path):
